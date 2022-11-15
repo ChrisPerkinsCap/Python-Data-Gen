@@ -1,96 +1,156 @@
 from os.path import exists
 import pandas
 from pandas import DataFrame
+import copy
 
 class GenerateRandomFirstNamesCSV:
     
-    # source_dir = "/Users/chris/Dev/Python-Data-Gen/CSV/"
-    # source_file = "FirstNames-fr.csv"
-    # target_file = "FirstNames-fr-Popularité.csv"
-    # num_rows = 172
+    ######## Constructor ########
 
-    def __init__(self, num_rows, source_dir, source_file, target_file):
+    def __init__(self, columns_order=list(), drop_columns=list(), final_sort=list(), num_rows=int,
+                    sort_columns=list(), source_dir=str, source_file=str, target_file=str):
+
+        if columns_order is None:
+            columns_order = ["NameCount", "sex", "name", "Rand"]
+        
+        self.set_columns_order(columns_order)
+
+        if drop_columns is None:
+            drop_columns = ["NameCount", "Rand"]
+        
+        self.set_drop_columns(drop_columns)
+
+        if final_sort is None:
+            final_sort = ["name", "sex", "NameCount", "Rand"]
+        
+        self.set_final_sort(final_sort)
+
+        if num_rows is None:
+            num_rows = 172
+        
+        self.set_num_rows(num_rows)
+
+        if sort_columns is None:
+            sort_columns = ["NameCount"]
+        
+        self.set_sort_columns(sort_columns)
+
+        if source_dir is None:
+            source_dir = "./CSV/"
+        
+        self.set_source_dir(source_dir)
+
+        if source_file is None:
+            source_file = "FirstNames-fr.csv"
+        
+        self.set_source_file(source_file)
+
+        if target_file is None:
+            target_file = "FirstNames-fr-Popularité.csv"
+        
+        self.set_target_file(target_file)
+
+        data = GenerateRandomFirstNamesCSV.read_file(source_dir, source_file)
+        # print(data)
+        self.set_data(data)
+
+    
+    ### GETTERS and SETTERS ###
+    
+    def get_columns_order(self) -> list():
+        return copy.deepcopy(self._columns_order)
+    
+    def set_columns_order(self, columns_order=list()) -> None:
+        self._columns_order = columns_order
+    
+    def get_drop_columns(self) -> list():
+        return copy.deepcopy(self._drop_columns)
+    
+    def set_drop_columns(self, drop_columns=list()) -> None:
+        self._drop_columns = drop_columns
+    
+    def get_final_sort(self) -> list():
+        return copy.deepcopy(self._final_sort)
+    
+    def set_final_sort(self, final_sort=list()) -> None:
+        self._final_sort = final_sort
+    
+    def get_num_rows(self) -> int:
+        return copy.copy(self._num_rows)
+    
+    def set_num_rows(self, num_rows=int) -> None:
         self._num_rows = num_rows
+    
+    def get_sort_columns(self) -> list():
+        return copy.deepcopy(self._sort_columns)
+    
+    def set_sort_columns(self, sort_columns=list()) -> None:
+        self._sort_columns = sort_columns
+    
+    def get_source_dir(self) -> str:
+        return copy.copy(self._source_dir)
+    
+    def set_source_dir(self, source_dir=str) -> None:
         self._source_dir = source_dir
+    
+    def get_source_file(self) -> str:
+        return copy.copy(self._source_file)
+    
+    def set_source_file(self, source_file=str) -> None:
         self._source_file = source_file
-        self._target_file = target_file
-        df = self.read_file(source_dir, source_file)
-        self._data = self.set_data(df)
     
-    def get_num_rows(self):
-        return self._num_rows
+    def get_target_file(self) -> str:
+        return copy.copy(self._target_file)
     
-    def set_num_rows(self, num_rows=int):
-        self._num_rows = num_rows
-    
-    def get_source_dir(self):
-        return self._source_dir
-    
-    def set_source_dir(self, source_dir=str):
-        self._source_dir = source_dir
-    
-    def get_source_file(self):
-        return self._source_file
-    
-    def set_source_file(self, source_file=str):
-        self.get_source_file = source_file
-    
-    def get_target_file(self):
-        return self._target_file
-    
-    def set_target_file(self, target_file=str):
+    def set_target_file(self, target_file=str) -> None:
         self._target_file =target_file
     
-    def get_data(self):
-        return self._data.copy(deep=True)
+    def get_data(self) -> DataFrame:
+        return copy.deepcopy(self._data)
     
-    def set_data(self, data=DataFrame):
-        self._data = data.copy(deep=True)
+    def set_data(self, data=DataFrame) -> None:
+        self._data = data
     
-    def read_file(self, source_dir=str, source_file=str):
-        data = pandas.read_csv(source_dir + source_file,
-            index_col="Popularité",
-            header=0,
-            names=['Prénom', 'Sexe', 'Popularité', 'Random Value'])
-        self.set_data(data)
-        return data
-    
-    def drop_data_column(self, data_table=DataFrame, drop_column=str):
-        data = data_table.drop(drop_column, axis=1)
-        self.set_data(data)
-        return data
+    ### INSTANCE METHODES ###
 
-    def sort_data_table(self, data_table=DataFrame, sort_column=str):
-        data = data_table.sort_values(by=[sort_column], ascending=False)
-        self.set_data(data)
-        return data
-    
-    def truncate_data_table(self, data_table=DataFrame, num_rows=int):
-        data = data_table.head(num_rows)
-        self.set_data(data)
-        return data
+    def print_data_frame(self) -> None:
+        print(self.get_data())
 
-    def randomize_rows(self, data_table=DataFrame, num_rows=int):
-        data = data_table.sample(num_rows)
-        self.set_data(data)
-        return data
+    ### CLASS METHODES ###
 
-    def process_csv_file(self, source_dir=str, source_file=str, num_rows=int, drop_column=str, sort_column=str):
-        data = self.read_file(source_dir, source_file)
-        data = self.drop_data_column(data, drop_column)
-        data = self.sort_data_table(data, sort_column)
-        data = self.truncate_data_table(data, num_rows)
-        data = self.randomize_rows(data, num_rows)
-        self.set_data(data)
+    @classmethod
+    def read_file(cls, source_dir=str, source_file=str) -> DataFrame:
+        return pandas.read_csv(source_dir + source_file)
+    
+    @classmethod
+    def drop_data_column(cls, data_table=DataFrame, drop_column=list()) -> DataFrame:
+        return data_table.drop(drop_column, axis=1)
+
+    @classmethod
+    def sort_data_table(cls, data_table=DataFrame, sort_columns=list(), columns_order=list()) -> DataFrame:
+        return data_table.sort_values(by=sort_columns, ascending=False, kind="mergesort")[columns_order]
+    
+    @classmethod
+    def truncate_data_table(cls, data_table=DataFrame, num_rows=int) -> DataFrame:
+        return data_table.head(num_rows)
+
+    @classmethod
+    def randomize_rows(cls, data_table=DataFrame, num_rows=int) -> DataFrame:
+        return data_table.sample(num_rows)
+
+    @classmethod
+    def process_csv_file(cls, columns_order=list(), drop_columns=list(), final_sort=list(), num_rows=int,
+                            sort_columns=list(), source_dir=str, source_file=str) -> DataFrame:
+        data = cls.read_file(source_dir, source_file)
+        data = cls.sort_data_table(data, sort_columns, columns_order)
+        data = cls.truncate_data_table(data, num_rows)
+        data = cls.sort_data_table(data, sort_columns, final_sort)
+        data = cls.drop_data_column(data, drop_columns)
+        data = cls.randomize_rows(data, num_rows)
         return data
     
-    def print_data_frame(self, data=DataFrame):
-        if data is None:
-            data = self.get_data()
-        print(data)
-    
-    def write_data_frame(self, data=DataFrame, target_file=str):
-        path = self.get_source_dir() + target_file
-        data.to_csv(path)
-        file_exists = exists(path)
-        return file_exists
+    @classmethod
+    def write_to_csv(cls, data=DataFrame, target_directory=str, target_file=str) -> bool:
+        file_path = target_directory + target_file
+        data.to_csv(file_path)
+        return exists(file_path)
