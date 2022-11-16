@@ -11,27 +11,27 @@ class GenerateRandomFirstNamesCSV:
                     sort_columns=list(), source_dir=str, source_file=str, target_file=str):
 
         if columns_order is None:
-            columns_order = ["NameCount", "sex", "name", "Rand"]
+            columns_order = ["Popularity", "Gender", "FirstName"]
         
         self.set_columns_order(columns_order)
 
         if drop_columns is None:
-            drop_columns = ["NameCount", "Rand"]
+            drop_columns = ["NameCount"]
         
         self.set_drop_columns(drop_columns)
 
         if final_sort is None:
-            final_sort = ["name", "sex", "NameCount", "Rand"]
+            final_sort = ["FirstName", "Gender", "Popularity"]
         
         self.set_final_sort(final_sort)
 
         if num_rows is None:
-            num_rows = 172
+            num_rows = 0
         
         self.set_num_rows(num_rows)
 
         if sort_columns is None:
-            sort_columns = ["NameCount"]
+            sort_columns = ["Popularity"]
         
         self.set_sort_columns(sort_columns)
 
@@ -41,12 +41,12 @@ class GenerateRandomFirstNamesCSV:
         self.set_source_dir(source_dir)
 
         if source_file is None:
-            source_file = "FirstNames-fr.csv"
+            source_file = "FirstNames-Popularity-fr.csv"
         
         self.set_source_file(source_file)
 
         if target_file is None:
-            target_file = "FirstNames-fr-Popularité.csv"
+            target_file = "FirstNames-Popularity-fr{{date()}}.csv"
         
         self.set_target_file(target_file)
 
@@ -113,6 +113,17 @@ class GenerateRandomFirstNamesCSV:
     
     ### INSTANCE METHODES ###
 
+    def order_by_popularity(self, ascend=bool) -> DataFrame:
+        data_frame = self.get_data()
+        return data_frame.sort_values(by="Popularity", ascending=ascend, kind="mergesort")
+    
+    def remove_column(self, column_name=str) -> DataFrame:
+        data_frame = self.get_data()
+        column = [column_name]
+        new_frame = GenerateRandomFirstNamesCSV.drop_data_column(data_frame, column)
+        self.set_data(new_frame)
+        return new_frame
+
     def print_data_frame(self) -> None:
         print(self.get_data())
 
@@ -121,6 +132,10 @@ class GenerateRandomFirstNamesCSV:
     @classmethod
     def read_file(cls, source_dir=str, source_file=str) -> DataFrame:
         return pandas.read_csv(source_dir + source_file)
+
+    @classmethod
+    def read_file_rename_columns(cls, source_dir=str, source_file=str, column_names=list()) -> DataFrame:
+        return pandas.read_csv(source_dir + source_file, header=0, names=column_names)
     
     @classmethod
     def drop_data_column(cls, data_table=DataFrame, drop_column=list()) -> DataFrame:
