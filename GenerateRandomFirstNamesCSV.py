@@ -2,6 +2,7 @@ from os.path import exists
 import pandas
 from pandas import DataFrame
 import copy
+from datetime import datetime
 
 class GenerateRandomFirstNamesCSV:
     
@@ -46,7 +47,8 @@ class GenerateRandomFirstNamesCSV:
         self.set_source_file(source_file)
 
         if target_file is None:
-            target_file = "FirstNames-Popularity-fr{{date()}}.csv"
+            dt = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+            target_file = f"FirstNames-Popularity-fr{dt}.csv"
         
         self.set_target_file(target_file)
 
@@ -166,6 +168,13 @@ class GenerateRandomFirstNamesCSV:
     
     @classmethod
     def write_to_csv(cls, data=DataFrame, target_directory=str, target_file=str) -> bool:
+        if target_file is None:
+            dt = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+            target_file = f"FirstNames-Popularity-fr{dt}.csv"
+        
+        if target_directory is None:
+            target_directory = "./CSV/"
+
         file_path = target_directory + target_file
-        data.to_csv(file_path)
+        data.to_csv(file_path, index=False)
         return exists(file_path)
