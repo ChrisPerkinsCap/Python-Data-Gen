@@ -156,13 +156,16 @@ class GenerateRandomFirstNamesCSV:
         return data_table.sample(num_rows)
 
     @classmethod
-    def process_csv_file(cls, columns_order=list(), drop_columns=list(), final_sort=list(), num_rows=int,
+    def prepare_data_frame(cls, columns_order=list(), drop_columns=list(), final_sort=list(), num_rows=int,
                             sort_columns=list(), source_dir=str, source_file=str) -> DataFrame:
         data = cls.read_file(source_dir, source_file)
         data = cls.sort_data_table(data, sort_columns, columns_order)
         data = cls.truncate_data_table(data, num_rows)
         data = cls.sort_data_table(data, sort_columns, final_sort)
-        data = cls.drop_data_column(data, drop_columns)
+
+        if drop_columns is not None:
+            data = cls.drop_data_column(data, drop_columns)
+            
         data = cls.randomize_rows(data, num_rows)
         return data
     
