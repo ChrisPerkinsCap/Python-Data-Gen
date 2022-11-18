@@ -1,3 +1,4 @@
+from __future__ import annotations
 import copy
 from datetime import datetime
 from decimal import Decimal
@@ -45,7 +46,7 @@ class RandomNamesGenerator:
         return copy.deepcopy(self._column_names)
 
     def set_column_names(self, column_names=list()) -> None:
-        self._columns_names = column_names
+        self._column_names = column_names
 
     def get_num_rows(self) -> int:
         return copy.copy(self._num_rows)
@@ -134,21 +135,20 @@ class RandomNamesGenerator:
         return data_table.sample(num_rows)
 
     @classmethod
-    def prepare_data_frame(cls, columns_order=list(), column_names=list(), drop_columns=list(), final_order=list(), num_rows=int,
-                           sort_columns=list(), source_dir=str, source_file=str) -> DataFrame:
-        data = cls.read_file(source_dir, source_file)
+    def prepare_data_frame(cls, names_gen:RandomNamesGenerator, columns_order=list(), drop_columns:list()=None, final_order=list(), sort_columns=list()) -> DataFrame:
+        data = cls.read_file(names_gen.get_source_dir(), names_gen.get_source_file())
 
-        if len(column_names) > 0:
-            data.rename(columns=column_names, inplace=True)
+        if len(names_gen.get_column_names()) > 0:
+            data.rename(columns=names_gen.get_column_names(), inplace=True)
 
         data = cls.sort_data_table(data, sort_columns, columns_order)
-        data = cls.truncate_data_table(data, num_rows)
+        data = cls.truncate_data_table(data, names_gen.get_num_rows())
         data = cls.sort_data_table(data, sort_columns, final_order)
 
         if drop_columns is not None:
             data = cls.drop_data_column(data, drop_columns)
 
-        data = cls.randomize_rows(data, num_rows)
+        data = cls.randomize_rows(data, names_gen.get_num_rows())
         return data
 
     @classmethod
