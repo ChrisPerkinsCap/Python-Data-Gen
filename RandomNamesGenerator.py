@@ -7,7 +7,7 @@ import pandas
 from pandas import DataFrame
 
 
-class GenRandomNames:
+class RandomNamesGenerator:
 
     ######## Constructor ########
 
@@ -31,7 +31,7 @@ class GenRandomNames:
 
         self.set_source_file(source_file)
 
-        data = GenRandomNames.read_file(source_dir, source_file)
+        data = RandomNamesGenerator.read_file(source_dir, source_file)
 
         if len(column_names) > 0:
             data.rename(columns=column_names, inplace=True)
@@ -80,7 +80,7 @@ class GenRandomNames:
     def remove_column(self, column_name=str) -> DataFrame:
         data_frame = self.get_data()
         column = [column_name]
-        new_frame = GenRandomNames.drop_data_column(
+        new_frame = RandomNamesGenerator.drop_data_column(
             data_frame, column)
         self.set_data(new_frame)
         return new_frame
@@ -96,7 +96,7 @@ class GenRandomNames:
 
     @classmethod
     def read_file(cls, source_dir=str, source_file=str) -> DataFrame:
-        path = GenRandomNames.build_path(source_dir, source_file)
+        path = RandomNamesGenerator.build_path(source_dir, source_file)
         return pandas.read_csv(filepath_or_buffer=path)
 
     @classmethod
