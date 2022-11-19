@@ -107,7 +107,6 @@ class RandomNamesGenerator:
         data.sort_values(by=sort_index, ascending=ascend,
                          kind="mergesort", inplace=True)
 
-        # print(data)
         dec_percent = Decimal(1) # Default the percentage of names to 100
         if percentage < 100:
             dec_percent = Decimal(f"0." + f"{percentage}") # Set to a Decimal percentage
@@ -123,8 +122,8 @@ class RandomNamesGenerator:
         return data_table.drop(drop_column, axis=1)
 
     @classmethod
-    def sort_data_table(cls, data_table=DataFrame, sort_columns=list(), columns_order=list()) -> DataFrame:
-        return data_table.sort_values(by=sort_columns, ascending=True, kind="mergesort")
+    def sort_data_table(cls, data_table=DataFrame, sort_columns=list(), ascend:bool=False) -> DataFrame:
+        return data_table.sort_values(by=sort_columns, ascending=ascend, kind="mergesort")
 
     @classmethod
     def truncate_data_table(cls, data_table=DataFrame, num_rows=int) -> DataFrame:
@@ -135,15 +134,17 @@ class RandomNamesGenerator:
         return data_table.sample(num_rows)
 
     @classmethod
-    def prepare_data_frame(cls, names_gen:RandomNamesGenerator, columns_order=list(), drop_columns:list()=None, final_order=list(), sort_columns=list()) -> DataFrame:
-        data = cls.read_file(names_gen.get_source_dir(), names_gen.get_source_file())
+    def prepare_data_frame(cls, names_gen:RandomNamesGenerator, columns_order:list, drop_columns:list=None, final_order:list=None, sort_columns:list=None, percentage:int=100, ascending:bool=False) -> DataFrame:
+        # data = cls.read_file(names_gen.get_source_dir(), names_gen.get_source_file())
 
+        data = cls.return_percentage(names_gen.get_data(), sort_columns, percentage, ascending)
+        
         if len(names_gen.get_column_names()) > 0:
             data.rename(columns=names_gen.get_column_names(), inplace=True)
 
-        data = cls.sort_data_table(data, sort_columns, columns_order)
+        data = cls.sort_data_table(data, sort_columns, ascending)
         data = cls.truncate_data_table(data, names_gen.get_num_rows())
-        data = cls.sort_data_table(data, sort_columns, final_order)
+        data = cls.sort_data_table(data, final_order, ascending)
 
         if drop_columns is not None:
             data = cls.drop_data_column(data, drop_columns)
