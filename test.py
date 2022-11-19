@@ -1,50 +1,99 @@
-from GenerateRandomFirstNamesCSV import GenerateRandomFirstNamesCSV
+from RandomNamesGenerator import RandomNamesGenerator as RNG
 import copy
 from datetime import datetime
+from faker import Faker
 
-source_dir = "./CSV/"
-source_file = "FirstNames-Popularity-fr.csv"
-target_file = "FirstNames-Popularity-fr.csv"
-drop_columns = ["NameCount", "Rand"]
-# sort_columns = ["name","sex","NameCount", "Rand"]
-sort_columns = ["Popularity"]
-final_sort = ["FirstName", "Gender", "Popularity"]
-columns_order = ["Popularity", "Gender", "FirstName"]
-# drop_columns = ["Random Value"]
-# sort_columns = ["Prénom", "sexe", "Popularité", "Random Value"]
-# columns_order = ["Popularité", "sexe", "Prénom", "Random Value"]
 num_rows = 172
+dt = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+source_dir = "./CSV/"
+target_file = f"Depatures-{dt}.csv"
+fnames_source_file = "FirstNames-Popularity-fr.csv"
+fnames_target_file = f"FirstNames-Popularity-fr-{dt}.csv"
+fnames_drop_columns = ["Popularity"]
 
-RG = GenerateRandomFirstNamesCSV(columns_order, drop_columns, final_sort, num_rows,
-                                 sort_columns, source_dir, source_file)
-# print(len(drop_columns))
-# df = RG.process_csv_file(columns_order, drop_columns, final_sort, num_rows,
-#                          sort_columns, source_dir, source_file)
+fnames_rename_columns = {'FirstName': 'Prénom', 'Gender': 'Sexe'}
 
-RG.print_data_frame()
+fnames_sort_columns = ["Popularity"]
+fnames_final_order = ["Prénom", "Sexe", "Popularity"]
+fnames_columns_order = ["Popularity", "Sexe", "Prénom"]
 
-# data = GenerateRandomFirstNamesCSV.process_csv_file(columns_order, drop_columns,
-#                                     final_sort, num_rows, sort_columns, source_dir, source_file)
+lnames_source_file = "LastNames-Popularity-fr.csv"
+lnames_target_file = f"LaststNames-Popularity-fr-{dt}.csv"
+lnames_drop_columns = ["Popularity"]
 
-# print(data.describe())
-# print(data)
+lnames_rename_columns = {'patronyme': 'Patronym', 'LastNameCount': 'Popularity'}
 
-# fresh_data = copy.copy(data.reindex())
+lnames_sort_columns = ["Popularity"]
+lnames_final_order = ["Patronym", "Popularity"]
+lnames_columns_order = ["Popularity", "Patronym"]
 
-# print(fresh_data)
+# sort_columns = ["NameCount"]
+# final_sort = ["name", "sex", "NameCount"]
+# columns_order = ["NameCount", "sex", "name"]
 
-fresh_data = RG.remove_column("Rand")
 
-fresh_data.rename(columns={'name':'FirstName', 'sex':'Gender', 'NameCount':'Popularity'}, inplace=True)
+FNG = RNG(fnames_rename_columns, num_rows, source_dir, fnames_source_file)
 
-RG.print_data_frame()
+# FNG.print_data_frame()
 
-print(RG.get_data())
 
-now_time = datetime.now()
-now_time_ft = now_time.strftime("%d-%m-%Y_%H:%M:%S")
+fn = FNG.get_data()
+# print(fn)
+# tn = GenerateRandomFirstNamesCSV.return_percentage(fn, fnames_sort_columns, 20, False)
+# print(tn)
+fn = RNG.prepare_data_frame(FNG, fnames_columns_order, None, fnames_final_order, fnames_sort_columns, 10, False)
 
-print(now_time_ft)
+print(fn)
 
-# GenerateRandomFirstNamesCSV.write_to_csv(
-#     fresh_data, source_dir, "FirstNames-Popularity-fr.csv")
+print("#### LAST NAMES ####")
+
+LNG = RNG(lnames_rename_columns, num_rows, source_dir, lnames_source_file)
+
+# LNG.print_data_frame()
+
+
+ln = LNG.get_data()
+
+ln = RNG.prepare_data_frame(LNG, lnames_columns_order, None, lnames_final_order, lnames_sort_columns, 30, False)
+
+# print(ln)
+
+LastNames = ln.Patronym.values.tolist()
+patronymes = list()
+
+for i in LastNames:
+    patronymes.append(str(i).capitalize())
+
+fn.insert(0, "Nom", patronymes)
+print(fn)
+
+# GenerateRandomFirstNamesCSV.write_to_csv(df, source_dir, target_file)
+
+GGID = list()
+
+f = Faker()
+
+for _ in range(num_rows):
+    GGID.append(f.unique.numerify(text='%#######'))
+
+
+fn.insert(0, 'GGID', GGID)
+
+# print(fn)
+
+
+# for i in range(len(GGUID)):
+#     print(GGUID[i])
+
+
+# GGUID = list()
+
+# for _ in range(10):
+#     GGUID.append(fake.numerify)
+
+
+
+
+# uuid = UUID(bytes=32)
+
+# print(uuid)
