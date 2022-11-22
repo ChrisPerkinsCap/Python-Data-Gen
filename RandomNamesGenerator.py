@@ -98,7 +98,9 @@ class RandomNamesGenerator:
     @classmethod
     def read_file(cls, source_dir=str, source_file=str) -> DataFrame:
         path = RandomNamesGenerator.build_path(source_dir, source_file)
-        return pandas.read_csv(filepath_or_buffer=path)
+        pd = pandas.read_csv(filepath_or_buffer=path)
+        # pd.set_option('display.max_columns', None)
+        return pd
 
     @classmethod
     def return_percentage(cls, data=DataFrame, sort_index=str, percentage=100, ascend=False) -> DataFrame:
@@ -107,15 +109,22 @@ class RandomNamesGenerator:
         data.sort_values(by=sort_index, ascending=ascend,
                          kind="mergesort", inplace=True)
 
-        dec_percent = Decimal(1) # Default the percentage of names to 100
-        if percentage < 100:
-            dec_percent = Decimal(f"0." + f"{percentage}") # Set to a Decimal percentage
+        num_names = cls.calculate_percentage_num_rows(data, percentage)
 
-        total_names = len(data)
-        num_names = int((total_names * dec_percent).to_integral()) # calculate num rows from top to return
         new_data = copy.copy(data.head(num_names))
 
         return new_data
+
+    @classmethod
+    def calculate_percentage_num_rows(cls, data=DataFrame, percentage=100) -> int:
+        dec_percent = Decimal(1)  # Default the percentage of names to 100
+        if percentage < 100:
+            # Set to a Decimal percentage
+            dec_percent = Decimal(f"0." + f"{percentage}")
+
+        total_names = len(data)
+        # calculate num rows from top to return
+        return int((total_names * dec_percent).to_integral())
 
     @classmethod
     def drop_data_column(cls, data_table=DataFrame, drop_column=list()) -> DataFrame:
