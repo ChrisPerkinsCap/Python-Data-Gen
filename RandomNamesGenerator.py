@@ -103,9 +103,12 @@ class RandomNamesGenerator:
         return pd
 
     @classmethod
-    def return_percentage(cls, data=DataFrame, sort_index=str, percentage=100, ascend=False) -> DataFrame:
+    def return_percentage(cls, data=DataFrame, percentage=100, ascend=False) -> DataFrame:
         if ascend is None:
             ascend = False # Default rank order to descending
+
+        sort_index = data.columns[len(data.columns) - 1]
+        
         data.sort_values(by=sort_index, ascending=ascend,
                          kind="mergesort", inplace=True)
 
@@ -146,7 +149,7 @@ class RandomNamesGenerator:
     def prepare_data_frame(cls, names_gen:RandomNamesGenerator, columns_order:list, drop_columns:list=None, final_order:list=None, sort_columns:list=None, percentage:int=100, ascending:bool=False) -> DataFrame:
         # data = cls.read_file(names_gen.get_source_dir(), names_gen.get_source_file())
 
-        data = cls.return_percentage(names_gen.get_data(), sort_columns, percentage, ascending)
+        data = cls.return_percentage(names_gen.get_data(), percentage, ascending)
         
         if len(names_gen.get_column_names()) > 0:
             data.rename(columns=names_gen.get_column_names(), inplace=True)
