@@ -1,10 +1,10 @@
 from __future__ import annotations
 import copy
 from datetime import datetime
-from decimal import Decimal
+import os
 from os.path import exists
 from os import mkdir
-from os import makedirs
+
 
 import pandas
 from pandas import DataFrame
@@ -32,6 +32,8 @@ class ListBuilder:
 
         self.set_data(data)
         # print(self.get_data())
+
+        self.set_cwd_path()
 
     ### GETTERS and SETTERS ###
 
@@ -61,6 +63,9 @@ class ListBuilder:
 
     def set_data(self, data=DataFrame) -> None:
         self._data = data
+    
+    def set_cwd_path(self) -> str:
+        self._cwd_path = os.getcwd()
 
     ### INSTANCE METHODES ###
 

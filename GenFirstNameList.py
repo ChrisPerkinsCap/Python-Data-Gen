@@ -1,6 +1,7 @@
 import csv
+import os
 
-source_dir = "/Users/chris/Dev/Python-Data-Gen/CSV/"
+source_dir = os.getcwd() + "/CSV/"
 
 FirstNames = []
 
