@@ -3,6 +3,8 @@ import copy
 from datetime import datetime
 from decimal import Decimal
 from os.path import exists
+from os import mkdir
+from os import makedirs
 
 import pandas
 from pandas import DataFrame
@@ -92,7 +94,6 @@ class RandomNamesGenerator:
     def read_file(cls, source_dir=str, source_file=str) -> DataFrame:
         path = RandomNamesGenerator.build_path(source_dir, source_file)
         pd = pandas.read_csv(filepath_or_buffer=path)
-        # pd.set_option('display.max_columns', None)
         return pd
 
     @classmethod
@@ -119,7 +120,7 @@ class RandomNamesGenerator:
             dec_percent = Decimal(f"0." + f"{percentage}")
         if percentage > 0 and percentage <= 10:
             dec_percent = Decimal(f"0{percentage}")
-        print(dec_percent)
+        
         total_names = len(data)
         # calculate num rows from top to return
         return int((total_names * dec_percent).to_integral())
@@ -159,7 +160,6 @@ class RandomNamesGenerator:
             num_rows = percentage_rows
 
         data = cls.return_percentage(names_gen.get_data(), percentage, ascending)
-        print(len(data))
         
         if len(names_gen.get_column_names()) > 0:
             data.rename(columns=names_gen.get_column_names(), inplace=True)
@@ -173,6 +173,13 @@ class RandomNamesGenerator:
 
         data = cls.randomize_rows(data, num_rows)
         return data
+    
+    @classmethod
+    def create_directory(cls, directory=str) -> bool:
+        success = False
+        if len(directory) > 0 and not exists(directory):
+            success = mkdir(directory)
+        return success
 
     @classmethod
     def write_to_csv(cls, data=DataFrame, target_directory=str, target_file=str) -> bool:
@@ -182,7 +189,25 @@ class RandomNamesGenerator:
 
         if target_directory is None:
             target_directory = "./CSV/"
+        
+        cls.create_directory(target_directory)
 
-        file_path = target_directory + target_file
+        file_path = target_directory + target_file + ".csv"
+        data
         data.to_csv(file_path, index=False)
+        return exists(file_path)
+
+    @classmethod
+    def write_to_xlsx(cls, data=DataFrame, target_directory=str, target_file=str) -> bool:
+        if target_file is None:
+            dt = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+            target_file = f"FirstNames-Popularity-fr{dt}.csv"
+
+        if target_directory is None:
+            target_directory = ["./CSV/"]
+        
+        cls.create_directory(target_directory)
+
+        file_path = target_directory + target_file + ".xlsx"
+        data.to_excel(file_path, index=False)
         return exists(file_path)
